@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant Email Professionnel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-red-50 p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-red-600 text-white p-6">
+                    <h1 class="text-3xl font-bold">📧 Assistant Email Professionnel</h1>
+                    <p class="text-blue-100 mt-2">Correction, amélioration et traduction d'emails avec IA</p>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-6">
+                            <!-- Premier Email -->
+                            <div class="bg-gradient-to-r from-blue-50 to-red-50 p-4 rounded-lg">
+                                <label class="flex items-center gap-2 font-semibold text-gray-700">
+                                    <input type="checkbox" id="firstEmail" checked class="w-5 h-5 text-blue-600 rounded">
+                                    Premier email (nouvelle conversation)
+                                </label>
+                            </div>
+
+                            <!-- History -->
+                            <div id="historySection" style="display: none;">
+                                <label class="block font-semibold text-gray-700 mb-2">Historique des échanges</label>
+                                <textarea id="emailHistory" placeholder="Collez l'historique..." class="w-full h-32 p-3 border rounded-lg"></textarea>
+                            </div>
+
+                            <!-- Content -->
+                            <div>
+                                <label class="block font-semibold text-gray-700 mb-2">Contenu / Instructions</label>
+                                <textarea id="emailContent" placeholder="Écrivez votre email..." class="w-full h-48 p-3 border rounded-lg"></textarea>
+                            </div>
+
+                            <!-- Settings -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-semibold text-gray-700 mb-2 text-sm">Langue</label>
+                                    <select id="language" class="w-full p-2 border rounded-lg">
+                                        <option value="auto">Auto-détection</option>
+                                        <option value="français">Français</option>
+                                        <option value="anglais">Anglais</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-gray-700 mb-2 text-sm">Ton</label>
+                                    <select id="tone" class="w-full p-2 border rounded-lg">
+                                        <option value="professional">Professionnel</option>
+                                        <option value="friendly">Amical</option>
+                                        <option value="casual">Décontracté</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-gray-700 mb-2 text-sm">Forme</label>
+                                    <select id="formality" class="w-full p-2 border rounded-lg">
+                                        <option value="vous">Vouvoiement</option>
+                                        <option value="tu">Tutoiement</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-gray-700 mb-2 text-sm">Longueur</label>
+                                    <select id="length" class="w-full p-2 border rounded-lg">
+                                        <option value="detailed">Détaillée</option>
+                                        <option value="short">Courte</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <button onclick="generateEmail()" class="w-full bg-gradient-to-r from-blue-600 to-red-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-red-700">
+                                ✨ Générer l'email
+                            </button>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <label class="font-semibold text-gray-700">Email généré</label>
+                                <button onclick="copyEmail()" id="copyBtn" class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700" style="display: none;">
+                                    📋 Copier
+                                </button>
+                            </div>
+                            <div id="result" class="bg-gray-50 border-2 rounded-lg p-4 min-h-[500px] whitespace-pre-wrap">
+                                <div class="flex items-center justify-center h-full text-gray-400">
+                                    Votre email apparaîtra ici
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
+                ✅ Assistant Email Professionnel avec Groq - 100% Gratuit
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle history section
+        document.getElementById('firstEmail').addEventListener('change', function(e) {
+            document.getElementById('historySection').style.display = e.target.checked ? 'none' : 'block';
+        });
+
+        async function generateEmail() {
+            const content = document.getElementById('emailContent').value.trim();
+            if (!content) {
+                alert('Veuillez entrer du contenu pour votre email');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            resultDiv.innerHTML = '<div class="flex items-center justify-center h-full"><div class="text-center"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div><p class="text-gray-600">Génération en cours...</p></div></div>';
+            copyBtn.style.display = 'none';
+
+            const isFirst = document.getElementById('firstEmail').checked;
+            const history = document.getElementById('emailHistory').value;
+            const language = document.getElementById('language').value;
+            const tone = document.getElementById('tone').value;
+            const formality = document.getElementById('formality').value;
+            const length = document.getElementById('length').value;
+
+            let prompt = `Tu es un assistant professionnel de rédaction d'emails. Voici les paramètres :\n\n`;
+            
+            if (isFirst) {
+                prompt += `**Type d'email** : Premier email (nouvelle conversation)\n`;
+            } else {
+                prompt += `**Type d'email** : Réponse à un échange existant\n`;
+                prompt += `**Historique des échanges** :\n${history}\n\n`;
+            }
+
+            prompt += `**Contenu** :\n${content}\n\n`;
+            prompt += `**Langue** : ${language === 'auto' ? 'Détecter automatiquement' : language}\n`;
+            prompt += `**Ton** : ${tone === 'professional' ? 'Professionnel' : tone === 'friendly' ? 'Amical' : 'Décontracté'}\n`;
+            prompt += `**Forme** : ${formality === 'vous' ? 'Vouvoiement' : 'Tutoiement'}\n`;
+            prompt += `**Longueur** : ${length === 'detailed' ? 'Détaillée' : 'Courte'}\n\n`;
+            prompt += `INSTRUCTIONS :\n1. Corrige l'orthographe et la grammaire\n2. Améliore la formulation\n3. Structure l'email professionnellement\n4. ${language !== 'auto' ? 'Traduis en ' + language : 'Garde la langue d\'origine'}\n\nRéponds UNIQUEMENT avec le texte de l'email final.`;
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                resultDiv.innerHTML = `<div class="text-gray-800 leading-relaxed">${data.result}</div>`;
+                copyBtn.style.display = 'block';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="text-red-600">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+
+        async function copyEmail() {
+            const text = document.getElementById('result').innerText;
+            try {
+                await navigator.clipboard.writeText(text);
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = '✅ Copié !';
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copier';
+                }, 2000);
+            } catch (error) {
+                alert('Erreur lors de la copie');
+            }
+        }
+    </script>
+</body>
+</html>
